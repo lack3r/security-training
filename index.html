@@ -1,40 +1,188 @@
 <!doctype html>
 <html lang="en">
-	<head>
-		<meta charset="utf-8">
-		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 
-		<title>reveal.js</title>
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 
-		<link rel="stylesheet" href="dist/reset.css">
-		<link rel="stylesheet" href="dist/reveal.css">
-		<link rel="stylesheet" href="dist/theme/black.css">
+	<title>reveal.js</title>
 
-		<!-- Theme used for syntax highlighted code -->
-		<link rel="stylesheet" href="plugin/highlight/monokai.css">
-	</head>
-	<body>
-		<div class="reveal">
-			<div class="slides">
-				<section>Slide 1</section>
-				<section>Slide 2</section>
-			</div>
+	<link rel="stylesheet" href="dist/reset.css">
+	<link rel="stylesheet" href="dist/reveal.css">
+	<link rel="stylesheet" href="dist/theme/black.css">
+
+	<!-- Theme used for syntax highlighted code -->
+	<link rel="stylesheet" href="plugin/highlight/monokai.css">
+</head>
+
+<body>
+	<div class="reveal">
+		<div class="slides">
+			<section data-markdown>
+				<textarea data-template>
+					  <!-- Slide 1 -->
+# Security Best Practices for .NET & React
+**Blending UI and Backend Security**
+
+*Interactive Demo & Best Practice Session*
+					</textarea>
+			</section>
+			<section data-markdown>
+				<textarea data-template>
+<!-- Slide 2 -->
+# Agenda
+- **Security Challenges in Modern Web Apps**
+- **Secure Communication:** HTTPS, CORS, Security Headers
+- **Authentication & Authorization:** JWT, Cookies, Anti-forgery
+- **.NET Backend Security:** Best practices in ASP.NET Core
+- **React Frontend Security:** Preventing XSS & Secure Token Handling
+- **Demo Walkthrough & Q&A**
+					</textarea>
+			</section>
+			<section data-markdown>
+				<textarea data-template>
+
+<!-- Slide 3 -->
+# Secure Communication
+- **Always use HTTPS:** Encrypt data in transit.
+- **CORS Configuration:** Limit API access to trusted origins.
+- **Security Headers:** Use headers like `Content-Security-Policy`, `X-Frame-Options`, etc.
+- **HSTS:** Enforce secure (HTTPS) connections.
+					</textarea>
+			</section>
+			<section data-markdown>
+				<textarea data-template>
+<!-- Slide 3 -->
+# Secure Communication
+- **Always use HTTPS:** Encrypt data in transit.
+- **CORS Configuration:** Limit API access to trusted origins.
+- **Security Headers:** Use headers like `Content-Security-Policy`, `X-Frame-Options`, etc.
+- **HSTS:** Enforce secure (HTTPS) connections.
+					</textarea>
+			</section>
+			<section data-markdown>
+				<textarea data-template>
+<!-- Slide 4 -->
+# Authentication & Authorization
+- **JWT Authentication:**
+  - Short-lived tokens
+  - Signed with a strong key
+- **Cookie-based Authentication:**
+  - Use HttpOnly and Secure flags
+- **Anti-forgery Tokens:**
+  - Prevent CSRF attacks on state-changing requests
+- **Role-based & Policy-based Authorization:**
+  - Granular access control in your APIs
+					</textarea>
+			</section>
+			<section data-markdown>
+				<textarea data-template>
+<!-- Slide 5 -->
+# .NET Backend Security Best Practices
+- **Use ASP.NET Core’s built-in authentication/authorization middleware**
+- **Implement JWT Bearer Authentication**
+- **Configure CORS Strictly:** Allow only specific origins.
+- **Enforce HTTPS:** Redirect HTTP requests automatically.
+- **Input Validation & Logging:** Prevent injections and monitor suspicious activities.
+
+					</textarea>
+			</section>
+			<section data-markdown>
+				<textarea data-template>
+<!-- Slide 6 -->
+# React Frontend Security Best Practices
+- **Avoid Storing Sensitive Data in LocalStorage/SessionStorage:**
+  - Consider in-memory storage or secure cookies
+- **Sanitize and Validate User Input:** Prevent XSS attacks
+- **Use Libraries/Frameworks with Security in Mind:** e.g., React automatically escapes output.
+- **CORS & API Communication:** Only call trusted endpoints.
+- **Keep Dependencies Up-to-Date:** Reduce vulnerabilities from third-party libraries.
+
+					</textarea>
+			</section>
+
+			<section data-markdown>
+				<textarea data-template>
+<!-- Slide 7 -->
+# Demo Repository Structure
+/SecurityDemo ├── backend/ (ASP.NET Core Web API) │ ├── Program.cs │ ├── SecurityDemo.csproj │ └── ... (other config files) └── frontend/ (React Application) ├── package.json └── src/ ├── index.js └── App.js
+- **Backend:** Secure API endpoints, JWT token generation, CORS configuration.
+- **Frontend:** Login form, token usage in API calls, handling secure responses.
+
+					</textarea>
+			</section>
+			<section data-markdown>
+				<textarea data-template>
+<!-- Slide 8 -->
+# Demo: Secure .NET Backend Walkthrough
+- **JWT Authentication:** Validate tokens and protect endpoints.
+- **CORS Policy:** Allow only trusted origins.
+- **HTTPS Enforcement:** Redirect and secure API communications.
+- **Endpoints:**
+  - `/api/login` – Authenticate user and return JWT.
+  - `/api/secure` – A protected endpoint requiring a valid JWT.
+
+*Code snippet will be shown in the demo.*
+					</textarea>
+			</section>
+			<section data-markdown>
+				<textarea data-template>
+<!-- Slide 9 -->
+# Demo: Secure React Frontend Walkthrough
+- **Login Flow:** Call `/api/login` to retrieve a JWT.
+- **Secure API Call:** Use the token to access `/api/secure`.
+- **Token Handling:** (Demo stores token in state; in production, consider HttpOnly cookies.)
+- **Error Handling:** Gracefully handle failed authentication/authorization.
+
+*Code snippet will be shown in the demo.*
+					</textarea>
+			</section>
+
+			<section data-markdown>
+				<textarea data-template>
+<!-- Slide 10 -->
+# Common Pitfalls & Mitigations
+- **Insecure Token Storage:** Avoid localStorage if possible.
+- **Overly Permissive CORS Policies:** Only allow trusted origins.
+- **Lack of Input Validation:** Sanitize all inputs to prevent injections.
+- **Ignoring HTTPS:** Never allow plaintext HTTP in production.
+- **Not Handling Token Expiry:** Implement token refresh or re-authentication.
+					</textarea>
+			</section>
+
+			<section data-markdown>
+				<textarea data-template>
+<!-- Slide 11 -->
+# Resources & Conclusion
+- **ASP.NET Core Security Documentation**
+- **React Security Best Practices**
+- **OWASP Top Ten**
+- **Further Reading:**
+  - [JWT Best Practices](https://jwt.io/introduction/)
+  - [CORS in ASP.NET Core](https://docs.microsoft.com/en-us/aspnet/core/security/cors)
+  - [Content Security Policy (CSP)](https://developer.mozilla.org/en-US/docs/Web/HTTP/CSP)
+  
+*Thank you – Questions & Discussion*
+					</textarea>
+			</section>
 		</div>
+	</div>
 
-		<script src="dist/reveal.js"></script>
-		<script src="plugin/notes/notes.js"></script>
-		<script src="plugin/markdown/markdown.js"></script>
-		<script src="plugin/highlight/highlight.js"></script>
-		<script>
-			// More info about initialization & config:
-			// - https://revealjs.com/initialization/
-			// - https://revealjs.com/config/
-			Reveal.initialize({
-				hash: true,
+	<script src="dist/reveal.js"></script>
+	<script src="plugin/notes/notes.js"></script>
+	<script src="plugin/markdown/markdown.js"></script>
+	<script src="plugin/highlight/highlight.js"></script>
+	<script>
+		// More info about initialization & config:
+		// - https://revealjs.com/initialization/
+		// - https://revealjs.com/config/
+		Reveal.initialize({
+			hash: true,
 
-				// Learn about plugins: https://revealjs.com/plugins/
-				plugins: [ RevealMarkdown, RevealHighlight, RevealNotes ]
-			});
-		</script>
-	</body>
+			// Learn about plugins: https://revealjs.com/plugins/
+			plugins: [RevealMarkdown, RevealHighlight, RevealNotes]
+		});
+	</script>
+</body>
+
 </html>
