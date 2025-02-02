@@ -68,11 +68,16 @@ var app = builder.Build();
 // Add middleware to inject security headers into every response.
 app.Use(async (context, next) =>
 {
-    context.Response.Headers["X-Content-Type-Options"] = "nosniff";
-    context.Response.Headers["X-Frame-Options"] = "DENY";
-    context.Response.Headers["X-XSS-Protection"] = "1; mode=block";
+    context.Response.Headers["X-Content-Type-Options"] = "nosniff"; // Prevent MIME type sniffing. https://cheatsheetseries.owasp.org/cheatsheets/HTTP_Headers_Cheat_Sheet.html#x-content-type-options
+    context.Response.Headers["X-Frame-Options"] = "DENY"; // Prevent clickjacking. https://cheatsheetseries.owasp.org/cheatsheets/HTTP_Headers_Cheat_Sheet.html#x-frame-options
     // A basic Content Security Policy. We can customize as needed.
-    context.Response.Headers["Content-Security-Policy"] = "default-src 'self'";
+    // Content Security Policy (CSP) is a security feature that is used to specify the origin of content that is allowed to be 
+    // loaded on a website or in a web applications. 
+    // It is an added layer of security that helps to detect and mitigate certain types of attacks, 
+    // including Cross-Site Scripting (XSS) and data injection attacks. 
+    // These attacks are used for everything from data theft to site defacement to distribution of malware.
+    // Cross site scripting attacks are a type of injection attack that injects malicious code into a web page.
+    context.Response.Headers["Content-Security-Policy"] = "default-src 'self'"; // https://cheatsheetseries.owasp.org/cheatsheets/HTTP_Headers_Cheat_Sheet.html#content-security-policy
     await next();
 });
 
