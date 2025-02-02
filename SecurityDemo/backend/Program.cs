@@ -7,9 +7,37 @@ using System.Threading.RateLimiting;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Load JWT key from configuration (appsettings.json or environment)
-var jwtKey = builder.Configuration["Jwt:Key"] ?? throw new Exception("JWT key not found in configuration.");
+// --------------------
+// Load configuration settings
+// --------------------
+
+// JWT settings
+var jwtSection = builder.Configuration.GetSection("Jwt");
+var jwtKey = jwtSection["Key"] ?? throw new Exception("JWT key not found in configuration.");
+var issuer = jwtSection["Issuer"];
+var audience = jwtSection["Audience"];
+var tokenExpiryHours = jwtSection.GetValue<int>("TokenExpiryHours", 1);
 var key = Encoding.ASCII.GetBytes(jwtKey);
+
+// CORS settings
+var allowedOrigins = builder.Configuration.GetSection("Cors:AllowedOrigins").Get<string[]>() 
+                     ?? new string[] { "https://localhost:3000" };
+
+// Rate limiting settings
+var rateLimitSection = builder.Configuration.GetSection("RateLimiting:Global");
+int permitLimit = rateLimitSection.GetValue<int>("PermitLimit", 10);
+int windowInMinutes = rateLimitSection.GetValue<int>("WindowInMinutes", 1);
+int queueLimit = rateLimitSection.GetValue<int>("QueueLimit", 2);
+
+// Security Headers settings
+var securityHeaders = builder.Configuration.GetSection("SecurityHeaders");
+string contentSecurityPolicy = securityHeaders["ContentSecurityPolicy"] ?? "default-src 'self'";
+string xContentTypeOptions = securityHeaders["XContentTypeOptions"] ?? "nosniff";
+string xFrameOptions = securityHeaders["XFrameOptions"] ?? "DENY";
+
+// --------------------
+// Service Configuration
+// --------------------
 
 // Configure JWT Bearer Authentication
 builder.Services.AddAuthentication(options =>
@@ -25,38 +53,40 @@ builder.Services.AddAuthentication(options =>
     {
          ValidateIssuerSigningKey = true,
          IssuerSigningKey = new SymmetricSecurityKey(key),
-         ValidateIssuer = false,
-         ValidateAudience = false,
+         ValidateIssuer = !string.IsNullOrEmpty(issuer),
+         ValidIssuer = issuer,
+         ValidateAudience = !string.IsNullOrEmpty(audience),
+         ValidAudience = audience,
          ClockSkew = TimeSpan.Zero
     };
 });
 
 builder.Services.AddAuthorization();
 
-// Configure CORS for our trusted frontend (adjust URL as needed)
+// Configure CORS
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("CorsPolicy", policy =>
     {
-         policy.WithOrigins("https://localhost:3000")
+         policy.WithOrigins(allowedOrigins)
                .AllowAnyHeader()
                .AllowAnyMethod();
     });
 });
 
-// Configure Rate Limiting (global: 10 requests per minute)
+// Configure Rate Limiting (global: based on configuration)
 builder.Services.AddRateLimiter(options =>
 {
     options.GlobalLimiter = PartitionedRateLimiter.Create<HttpContext, string>(context =>
     {
-        // For simplicity, using a single partition; in production, partition by IP or user
+        // For simplicity, using a single partition; in production, you might partition by IP address or user.
         return RateLimitPartition.GetFixedWindowLimiter("GlobalLimiter", _ =>
             new FixedWindowRateLimiterOptions
             {
-                PermitLimit = 10,
-                Window = TimeSpan.FromMinutes(1),
+                PermitLimit = permitLimit,
+                Window = TimeSpan.FromMinutes(windowInMinutes),
                 QueueProcessingOrder = QueueProcessingOrder.OldestFirst,
-                QueueLimit = 2
+                QueueLimit = queueLimit
             });
     });
     options.RejectionStatusCode = 429; // HTTP 429 Too Many Requests
@@ -64,19 +94,16 @@ builder.Services.AddRateLimiter(options =>
 
 var app = builder.Build();
 
-// Middleware: Add security headers to every response.
+// --------------------
+// Middleware Configuration
+// --------------------
+
+// Add security headers to every response.
 app.Use(async (context, next) =>
 {
-    context.Response.Headers["X-Content-Type-Options"] = "nosniff"; // Prevent MIME type sniffing. https://cheatsheetseries.owasp.org/cheatsheets/HTTP_Headers_Cheat_Sheet.html#x-content-type-options
-    context.Response.Headers["X-Frame-Options"] = "DENY"; // Prevent clickjacking. https://cheatsheetseries.owasp.org/cheatsheets/HTTP_Headers_Cheat_Sheet.html#x-frame-options
-    // A basic Content Security Policy. We can customize as needed.
-    // Content Security Policy (CSP) is a security feature that is used to specify the origin of content that is allowed to be 
-    // loaded on a website or in a web applications. 
-    // It is an added layer of security that helps to detect and mitigate certain types of attacks, 
-    // including Cross-Site Scripting (XSS) and data injection attacks. 
-    // These attacks are used for everything from data theft to site defacement to distribution of malware.
-    // Cross site scripting attacks are a type of injection attack that injects malicious code into a web page.
-    context.Response.Headers["Content-Security-Policy"] = "default-src 'self'"; // https://cheatsheetseries.owasp.org/cheatsheets/HTTP_Headers_Cheat_Sheet.html#content-security-policy
+    context.Response.Headers["X-Content-Type-Options"] = xContentTypeOptions;
+    context.Response.Headers["X-Frame-Options"] = xFrameOptions;
+    context.Response.Headers["Content-Security-Policy"] = contentSecurityPolicy;
     await next();
 });
 
@@ -93,6 +120,10 @@ app.UseAuthentication();
 app.UseAuthorization();
 app.UseRateLimiter();
 
+// --------------------
+// Endpoint Configuration
+// --------------------
+
 // Secure endpoint: requires a valid JWT.
 app.MapGet("/api/secure", [Authorize] () =>
     Results.Ok(new { message = "This is a secure endpoint" })
@@ -106,7 +137,9 @@ app.MapPost("/api/login", (UserCredentials credentials) =>
          var tokenHandler = new System.IdentityModel.Tokens.Jwt.JwtSecurityTokenHandler();
          var tokenDescriptor = new SecurityTokenDescriptor
          {
-             Expires = DateTime.UtcNow.AddHours(1),
+             Expires = DateTime.UtcNow.AddHours(tokenExpiryHours),
+             Issuer = issuer,         // Added Issuer from configuration
+             Audience = audience,     // Added Audience from configuration
              SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
          };
          var token = tokenHandler.CreateToken(tokenDescriptor);
@@ -115,6 +148,7 @@ app.MapPost("/api/login", (UserCredentials credentials) =>
     }
     return Results.Unauthorized();
 });
+
 
 // In-memory storage for resources (using UUIDs)
 var resources = new ConcurrentDictionary<Guid, Resource>();
@@ -145,7 +179,9 @@ app.MapGet("/api/resource/{id:guid}", (Guid id) =>
 
 app.Run();
 
-// Record types
+// --------------------
+// Record Types
+// --------------------
 public record UserCredentials(string Username, string Password);
 public record Resource
 {
