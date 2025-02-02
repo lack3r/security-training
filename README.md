@@ -55,4 +55,4 @@ Open a new terminal, navigate to the frontend folder, install dependencies, and 
 The frontend will be available at: https://localhost:3000/
 
 ## Pending Improvements
-[ ] Add a section regarding KeyVault integration for managing secrets
+- [ ] Add a section regarding KeyVault integration for managing secrets
