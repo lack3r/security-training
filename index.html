@@ -35,25 +35,58 @@
           </textarea>
         </section>
         <!-- Slide 3: Secure Communication -->
-        <section data-markdown>
-          <textarea data-template>
-## Secure Communication
-- **HTTPS:** Encrypts data in transit.
-- **CORS:** Restricts API access to trusted origins.
-- **Security Headers:** Use headers like `Content-Security-Policy`, `X-Frame-Options`, etc.
-- **HSTS:** Enforces secure connections.
-          </textarea>
+        <section>
+			<section data-markdown>
+				<textarea data-template>
+					## Secure Communication
+					- **HTTPS:** Encrypts data in transit.
+					- **CORS:** Restricts API access to trusted origins.
+					- **Security Headers:** Use headers like `Content-Security-Policy`, `X-Frame-Options`, etc.
+					- **HSTS:** Enforces secure connections.
+				</textarea>
+			</section>
+			<section data-markdown>
+				<textarea data-template>
+					## HSTS (HTTP Strict Transport Security)
+					- What it is: HSTS is a mechanism that tells browsers to only use HTTPS for all future requests to your site. This prevents protocol downgrade attacks and cookie hijacking.
+					- Demo Note: Our demo includes HTTPS redirection (app.UseHttpsRedirection()). In a production setting, you’d also typically add HSTS by calling app.UseHsts() (usually in non-development environments) to enforce HTTPS.
+				</textarea>
+			</section>
+		</section>
+          
         </section>
         <!-- Slide 4: Authentication & Authorization -->
-        <section data-markdown>
-          <textarea data-template>
+        <section>
+			<section data-markdown>
+				<textarea data-template>
 ## Authentication & Authorization
 - **JWT Authentication:**
   - Short-lived, signed tokens (see [jwt.io](https://jwt.io/)).
 - **Bearer Tokens:** Included in the `Authorization` header.
 - **Anti-forgery Measures:** CSRF tokens and secure cookie practices.
-          </textarea>
-        </section>
+</textarea>
+</section>
+<section data-markdown>
+	<textarea data-template>
+		## Antiforgery
+		- What it is: ASP.NET Core provides built‑in support for antiforgery tokens to protect against Cross-Site Request Forgery (CSRF) attacks on form submissions and state-changing endpoints.
+		- Demo Note: In our demo, we use JWTs (sent in the `Authorization` header), which are immune to CSRF because they aren’t automatically sent by the browser like cookies are. 
+		- However, if you were using cookie‑based authentication, you’d want to include antiforgery tokens. 
+		- In MVC scenarios you’d use the `[ValidateAntiForgeryToken]` attribute and add the token to forms.
+	</textarea>
+</section>
+<section data-markdown>
+	<textarea data-template>
+		## CSRF Tokens & Secure Cookies
+		- **What they are:**  
+		    - CSRF Tokens: Used mainly with cookie-based authentication, these tokens ensure that a malicious site cannot trick a user’s browser into performing unintended actions on a trusted site.
+		    - Secure Cookies: When using cookies for authentication, setting them as HttpOnly and Secure (and `SameSite`) helps protect against XSS and CSRF attacks.
+		- **Demo Note:** Since our demo stores the JWT in application state (and not in cookies), we don’t directly cover secure cookie configuration. In a production scenario where you do use cookies for auth, it’s important to mark cookies with `HttpOnly`, `Secure`, and proper `SameSite` settings.
+	</textarea>
+</section>
+</section>
+
+</section>
         <!-- Slide 5: .NET Backend Security Best Practices -->
         <section data-markdown>
           <textarea data-template>
@@ -85,10 +118,12 @@
 /SecurityDemo
 ├── backend/ (ASP.NET Core Web API)
 │   ├── Program.cs
-│   ├── SecurityDemo.csproj
-│   └── ... (other config files)
+│   ├── appsettings.json
+│   ├── Properties/launchSettings.json
+│   └── SecurityDemo.csproj
 └── frontend/ (React Application)
-    ├── package.json
+	├── public/index.html
+	├── package.json
     └── src/
         ├── index.js
         └── App.js
