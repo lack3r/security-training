@@ -7,7 +7,7 @@ function App() {
   // Login function: fetches JWT from the backend.
   const login = async () => {
     try {
-      const response = await fetch('http://localhost:5000/api/login', {
+      const response = await fetch('https://localhost:5001/api/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ username: 'test', password: 'password' }),
@@ -26,7 +26,7 @@ function App() {
   // Fetch secure data using the token.
   const fetchSecureMessage = async () => {
     try {
-      const response = await fetch('http://localhost:5000/api/secure', {
+      const response = await fetch('https://localhost:5001/api/secure', {
         headers: {
           'Authorization': `Bearer ${token}`
         }
