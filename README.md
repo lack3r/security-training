@@ -9,7 +9,7 @@ It contains:
 
 ## Instructions
 1. Clone the repository `git@github.com:lack3r/security-training.git`
-2. Run `cd security-training && npm install && npm start` to start the slides. The slides will be available at `http://localhost:8000/`
+2. Run `npm install && npm start` to start the slides. The slides will be available at `http://localhost:8000/`
 3. Run `cd SecurityDemo/backend && dotnet run` to start the backend. The backend will be available at `https://localhost:5001`
 4. Run `cd SecurityDemo/frontend && npm install && npm start` to start the frontend. The frontend will be available at `http://localhost:3000`
 
