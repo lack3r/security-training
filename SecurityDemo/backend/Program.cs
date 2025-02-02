@@ -66,7 +66,6 @@ var app = builder.Build();
 
 // Middleware: Add security headers to every response.
 app.Use(async (context, next) =>
-(async (context, next) =>
 {
     context.Response.Headers["X-Content-Type-Options"] = "nosniff"; // Prevent MIME type sniffing. https://cheatsheetseries.owasp.org/cheatsheets/HTTP_Headers_Cheat_Sheet.html#x-content-type-options
     context.Response.Headers["X-Frame-Options"] = "DENY"; // Prevent clickjacking. https://cheatsheetseries.owasp.org/cheatsheets/HTTP_Headers_Cheat_Sheet.html#x-frame-options
