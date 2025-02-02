@@ -81,6 +81,13 @@ app.Use(async (context, next) =>
 });
 
 app.UseHttpsRedirection();
+
+if (!app.Environment.IsDevelopment())
+{
+    app.UseExceptionHandler("/Error");
+    app.UseHsts();
+}
+
 app.UseCors("CorsPolicy");
 app.UseAuthentication();
 app.UseAuthorization();
