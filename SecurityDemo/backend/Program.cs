@@ -1,4 +1,5 @@
 using System.Text;
+using System.Collections.Concurrent;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.AspNetCore.Authorization;
@@ -64,13 +65,13 @@ builder.Services.AddRateLimiter(options =>
 
 var app = builder.Build();
 
-// Add a middleware to inject security headers into every response.
+// Add middleware to inject security headers into every response.
 app.Use(async (context, next) =>
 {
     context.Response.Headers["X-Content-Type-Options"] = "nosniff";
     context.Response.Headers["X-Frame-Options"] = "DENY";
     context.Response.Headers["X-XSS-Protection"] = "1; mode=block";
-    // A basic Content Security Policy. Customize as needed.
+    // A basic Content Security Policy. We can customize as needed.
     context.Response.Headers["Content-Security-Policy"] = "default-src 'self'";
     await next();
 });
@@ -105,20 +106,42 @@ app.MapPost("/api/login", (UserCredentials credentials) =>
     return Results.Unauthorized();
 });
 
-// New endpoint to demonstrate using UUIDs for resource IDs.
-// This replaces traditional incremental IDs with a UUID.
+// In-memory storage for resources, for demo purposes (just to avoid having to create a database).
+var resources = new ConcurrentDictionary<Guid, Resource>();
+
+// Endpoint to create a new resource with a UUID (POST)
 app.MapPost("/api/resource", () =>
 {
-    var resource = new
+    var resource = new Resource
     {
         Id = Guid.NewGuid(), // Use a UUID
         Name = "New Resource",
         CreatedAt = DateTime.UtcNow
     };
+
+    resources[resource.Id] = resource;
     return Results.Ok(resource);
+});
+
+// Endpoint to retrieve a resource by UUID (GET)
+app.MapGet("/api/resource/{id:guid}", (Guid id) =>
+{
+    if (resources.TryGetValue(id, out var resource))
+    {
+        return Results.Ok(resource);
+    }
+    return Results.NotFound();
 });
 
 app.Run();
 
 // Record type for user credentials.
 public record UserCredentials(string Username, string Password);
+
+// Model for a resource.
+public record Resource
+{
+    public Guid Id { get; init; }
+    public string Name { get; init; } = string.Empty;
+    public DateTime CreatedAt { get; init; }
+}
