@@ -7,11 +7,11 @@ using System.Threading.RateLimiting;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// For demo purposes: hardcoded JWT key (store securely in production!)
-var jwtKey = "YourSuperSecretKey_ChangeThisInProduction!";
+// Load JWT key from configuration (appsettings.json or environment)
+var jwtKey = builder.Configuration["Jwt:Key"] ?? throw new Exception("JWT key not found in configuration.");
 var key = Encoding.ASCII.GetBytes(jwtKey);
 
-// Configure Authentication with JWT Bearer
+// Configure JWT Bearer Authentication
 builder.Services.AddAuthentication(options =>
 {
     options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -33,24 +33,23 @@ builder.Services.AddAuthentication(options =>
 
 builder.Services.AddAuthorization();
 
-// Configure CORS to allow only trusted origins (e.g., our React app)
+// Configure CORS for our trusted frontend (adjust URL as needed)
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("CorsPolicy", policy =>
     {
-         policy.WithOrigins("http://localhost:3000")
+         policy.WithOrigins("https://localhost:3000")
                .AllowAnyHeader()
                .AllowAnyMethod();
     });
 });
 
-// Configure Rate Limiting using the built‑in RateLimiter
+// Configure Rate Limiting (global: 10 requests per minute)
 builder.Services.AddRateLimiter(options =>
 {
-    // Create a global limiter that limits all clients to 10 requests per minute.
     options.GlobalLimiter = PartitionedRateLimiter.Create<HttpContext, string>(context =>
     {
-        // Here you can partition by IP address, for example. For simplicity, we use a single partition.
+        // For simplicity, using a single partition; in production, partition by IP or user
         return RateLimitPartition.GetFixedWindowLimiter("GlobalLimiter", _ =>
             new FixedWindowRateLimiterOptions
             {
@@ -65,8 +64,9 @@ builder.Services.AddRateLimiter(options =>
 
 var app = builder.Build();
 
-// Add middleware to inject security headers into every response.
+// Middleware: Add security headers to every response.
 app.Use(async (context, next) =>
+(async (context, next) =>
 {
     context.Response.Headers["X-Content-Type-Options"] = "nosniff"; // Prevent MIME type sniffing. https://cheatsheetseries.owasp.org/cheatsheets/HTTP_Headers_Cheat_Sheet.html#x-content-type-options
     context.Response.Headers["X-Frame-Options"] = "DENY"; // Prevent clickjacking. https://cheatsheetseries.owasp.org/cheatsheets/HTTP_Headers_Cheat_Sheet.html#x-frame-options
@@ -87,15 +87,14 @@ app.UseAuthentication();
 app.UseAuthorization();
 app.UseRateLimiter();
 
-// Secure endpoint: accessible only with a valid JWT.
+// Secure endpoint: requires a valid JWT.
 app.MapGet("/api/secure", [Authorize] () =>
     Results.Ok(new { message = "This is a secure endpoint" })
 );
 
-// Login endpoint: for demo purposes, uses fixed credentials.
+// Login endpoint: demo fixed credentials ("test"/"password")
 app.MapPost("/api/login", (UserCredentials credentials) =>
 {
-    // In production, validate credentials against a user store.
     if (credentials.Username == "test" && credentials.Password == "password")
     {
          var tokenHandler = new System.IdentityModel.Tokens.Jwt.JwtSecurityTokenHandler();
@@ -111,15 +110,15 @@ app.MapPost("/api/login", (UserCredentials credentials) =>
     return Results.Unauthorized();
 });
 
-// In-memory storage for resources, for demo purposes (just to avoid having to create a database).
+// In-memory storage for resources (using UUIDs)
 var resources = new ConcurrentDictionary<Guid, Resource>();
 
-// Endpoint to create a new resource with a UUID (POST)
+// Create a new resource (POST) – uses a UUID as ID.
 app.MapPost("/api/resource", () =>
 {
     var resource = new Resource
     {
-        Id = Guid.NewGuid(), // Use a UUID
+        Id = Guid.NewGuid(),
         Name = "New Resource",
         CreatedAt = DateTime.UtcNow
     };
@@ -128,7 +127,7 @@ app.MapPost("/api/resource", () =>
     return Results.Ok(resource);
 });
 
-// Endpoint to retrieve a resource by UUID (GET)
+// Retrieve a resource by UUID (GET)
 app.MapGet("/api/resource/{id:guid}", (Guid id) =>
 {
     if (resources.TryGetValue(id, out var resource))
@@ -140,10 +139,8 @@ app.MapGet("/api/resource/{id:guid}", (Guid id) =>
 
 app.Run();
 
-// Record type for user credentials.
+// Record types
 public record UserCredentials(string Username, string Password);
-
-// Model for a resource.
 public record Resource
 {
     public Guid Id { get; init; }

@@ -1,94 +1,86 @@
 <!doctype html>
 <html lang="en">
-
-<head>
-	<meta charset="utf-8">
-	<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-	<title>reveal.js</title>
-	<link rel="stylesheet" href="dist/reset.css">
-	<link rel="stylesheet" href="dist/reveal.css">
-	<link rel="stylesheet" href="dist/theme/black.css">
-	<!-- Theme used for syntax highlighted code -->
-	<link rel="stylesheet" href="plugin/highlight/monokai.css">
-</head>
-
-<body>
-	<div class="reveal">
-		<div class="slides">
-			<!-- Slide 1 -->
-			<section data-markdown>
-				<textarea data-template>
-## Security Best Practices for .NET & React
-**Blending UI and Backend Security**
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Security Best Practices for .NET & React</title>
+    <link rel="stylesheet" href="dist/reset.css">
+    <link rel="stylesheet" href="dist/reveal.css">
+    <link rel="stylesheet" href="dist/theme/black.css">
+    <!-- Syntax Highlighting Theme -->
+    <link rel="stylesheet" href="plugin/highlight/monokai.css">
+  </head>
+  <body>
+    <div class="reveal">
+      <div class="slides">
+        <!-- Slide 1: Title -->
+        <section data-markdown>
+          <textarea data-template>
+# Security Best Practices for .NET & React
+**Blending UI & Backend Security**
 
 *Interactive Demo & Best Practice Session*
           </textarea>
-			</section>
-			<!-- Slide 2 -->
-			<section data-markdown>
-				<textarea data-template>
+        </section>
+        <!-- Slide 2: Agenda -->
+        <section data-markdown>
+          <textarea data-template>
 ## Agenda
-- **Security Challenges in Modern Web Apps**
-- **Secure Communication:** HTTPS, CORS, Security Headers
-- **Authentication & Authorization:** JWT, Cookies, Anti-forgery
-- **.NET Backend Security:** Best practices in ASP.NET Core
-- **React Frontend Security:** Preventing XSS & Secure Token Handling
-- **Demo Walkthrough & Q&A**
+- Security Challenges in Modern Web Apps
+- Secure Communication (HTTPS, CORS, Security Headers)
+- Authentication & Authorization (JWT, Cookies, Anti-forgery)
+- .NET Backend Security Best Practices (Rate Limiting, UUIDs)
+- React Frontend Security Best Practices
+- Demo Walkthrough & Q&A
           </textarea>
-			</section>
-			<!-- Slide 3 -->
-			<section data-markdown>
-				<textarea data-template>
+        </section>
+        <!-- Slide 3: Secure Communication -->
+        <section data-markdown>
+          <textarea data-template>
 ## Secure Communication
-# Secure Communication
-- **Always use HTTPS:** Encrypt data in transit.
-- **CORS Configuration:** Limit API access to trusted origins.
+- **HTTPS:** Encrypts data in transit.
+- **CORS:** Restricts API access to trusted origins.
 - **Security Headers:** Use headers like `Content-Security-Policy`, `X-Frame-Options`, etc.
-- **HSTS:** Enforce secure (HTTPS) connections.
+- **HSTS:** Enforces secure connections.
           </textarea>
-			</section>
-			<!-- Slide 4 -->
-			<section data-markdown>
-				<textarea data-template>
+        </section>
+        <!-- Slide 4: Authentication & Authorization -->
+        <section data-markdown>
+          <textarea data-template>
 ## Authentication & Authorization
 - **JWT Authentication:**
-  - Short-lived tokens. During the demo see [jwt.io](https://jwt.io/)
-  - Signed with a strong key
-- **Cookie-based Authentication:**
-  - Use HttpOnly and Secure flags
-- **Anti-forgery Tokens:**
-  - Prevent CSRF attacks on state-changing requests
-- **Role-based & Policy-based Authorization:**
-  - Granular access control in your APIs
+  - Short-lived, signed tokens (see [jwt.io](https://jwt.io/)).
+- **Bearer Tokens:** Included in the `Authorization` header.
+- **Anti-forgery Measures:** CSRF tokens and secure cookie practices.
           </textarea>
-			</section>
-			<!-- Slide 5 -->
-			<section data-markdown>
-				<textarea data-template>
+        </section>
+        <!-- Slide 5: .NET Backend Security Best Practices -->
+        <section data-markdown>
+          <textarea data-template>
 ## .NET Backend Security Best Practices
-- **Use ASP.NET Core’s built-in authentication/authorization middleware**
-- **Implement JWT Bearer Authentication**
-- **Configure CORS Strictly:** Allow only specific origins.
-- **Enforce HTTPS:** Redirect HTTP requests automatically.
-- **Input Validation & Logging:** Prevent injections and monitor suspicious activities.
+- Built-in authentication/authorization middleware.
+- Enforce HTTPS & configure strict CORS policies.
+- **Rate Limiting:** Prevent brute-force attacks (HTTP 429).
+- **Security Headers:** Mitigate XSS, clickjacking, etc.
+- Use **UUIDs** for resource IDs instead of incremental IDs.
           </textarea>
-			</section>
-			<!-- Slide 6 -->
-			<section data-markdown>
-				<textarea data-template>
+        </section>
+        <!-- Slide 6: React Frontend Security Best Practices -->
+        <section data-markdown>
+          <textarea data-template>
 ## React Frontend Security Best Practices
-- **Avoid Storing Sensitive Data in LocalStorage/SessionStorage:**
-  - Consider in-memory storage or secure cookies
-- **Sanitize and Validate User Input:** Prevent XSS attacks
-- **Use Libraries/Frameworks with Security in Mind:** e.g., React automatically escapes output.
-- **CORS & API Communication:** Only call trusted endpoints.
-- **Keep Dependencies Up-to-Date:** Reduce vulnerabilities from third-party libraries.
+- Avoid storing tokens in localStorage; consider secure cookies.
+- Sanitize & validate user inputs to prevent XSS.
+- Use frameworks (like React) that auto-escape outputs.
+- Enforce CORS: Only call trusted API endpoints.
+- Keep dependencies updated.
           </textarea>
-			</section>
-			<!-- Slide 7 -->
-			<section data-markdown>
-				<textarea data-template>
+        </section>
+        <!-- Slide 7: Demo Repository Structure -->
+        <section data-markdown>
+          <textarea data-template>
 ## Demo Repository Structure
+
 ```
 /SecurityDemo
 ├── backend/ (ASP.NET Core Web API)
@@ -101,98 +93,79 @@
         ├── index.js
         └── App.js
 ```
-- **Backend:** Secure API endpoints, JWT token generation, CORS configuration.
-- **Frontend:** Login form, token usage in API calls, handling secure responses.
-          </textarea>
-			</section>
-			<!-- Slide 8 -->
-			<section data-markdown>
-				<textarea data-template>
-## Demo: Secure .NET Backend Walkthrough
-- **JWT Authentication:** Validate tokens and protect endpoints.
-- **CORS Policy:** Allow only trusted origins.
-- **HTTPS Enforcement:** Redirect and secure API communications.
-- **Endpoints:**
-  - `/api/login` – Authenticate user and return JWT.
-  - `/api/secure` – A protected endpoint requiring a valid JWT.
-
-*Code snippet will be shown in the demo.*
-          </textarea>
-			</section>
-			<!-- Slide 9 -->
-			<section data-markdown>
-				<textarea data-template>
-## Demo: Secure React Frontend Walkthrough
-- **Login Flow:** Call `/api/login` to retrieve a JWT.
-- **Secure API Call:** Use the token to access `/api/secure`.
-- **Token Handling:** (Demo stores token in state; in production, consider HttpOnly cookies.)
-- **Error Handling:** Gracefully handle failed authentication/authorization.
-
-*Code snippet will be shown in the demo.*
-          </textarea>
-			</section>
-			<!-- Slide 10 -->
-			<section data-markdown>
-				<textarea data-template>
+</textarea>
+</section>
+<!-- Slide 8: Demo – .NET Backend Walkthrough -->
+<section data-markdown>
+  <textarea data-template>
+## Demo: .NET Backend Walkthrough
+- **JWT Login:** `/api/login`
+- **Secure Endpoint:** `/api/secure`
+- **Advanced Features:**
+- **Rate Limiting**
+- **Security Headers**
+- **UUID-based Resources:** `/api/resource` (POST & GET)
+  </textarea>
+</section>
+<!-- Slide 9: Demo – React Frontend Walkthrough -->
+<section data-markdown>
+  <textarea data-template>
+## Demo: React Frontend Walkthrough
+- **Login Flow:** Call `/api/login` to receive JWT.
+- **Fetch Secure Data:** Use the JWT to access `/api/secure`.
+- **Resource Management:**
+- Create a resource with UUID (`POST /api/resource`)
+- Retrieve it using its UUID (`GET /api/resource/{uuid}`)
+  </textarea>
+</section>
+<!-- Slide 10: Common Pitfalls & Mitigations -->
+<section data-markdown>
+  <textarea data-template>
 ## Common Pitfalls & Mitigations
-- **Insecure Token Storage:** Avoid localStorage if possible.
-- **Overly Permissive CORS Policies:** Only allow trusted origins.
-- **Lack of Input Validation:** Sanitize all inputs to prevent injections.
-- **Ignoring HTTPS:** Never allow plaintext HTTP in production.
-- **Not Handling Token Expiry:** Implement token refresh or re-authentication.
-          </textarea>
-			</section>
-			<!-- Slide 11 -->
-			<section data-markdown>
-				<textarea data-template>
-		  ## Common Issues & Mitigations
-		  - **Vulnerable Libraries:** Utilise a tool to scan your dependencies.
-		  - See [here](https://github.com/lack3r/security-training/security/dependabot)
-		  - Similar: [Snyk](https://snyk.io/plans/)
-		  - DDOS Protection: [Cloudflare](https://www.cloudflare.com/ddos/)
-		  - RateLimiting (HTTP 429) - Check demo -> Prevent brute-force attacks or abuse of endpoints.
-		  - Use UUIDs for IDs, not auto-incrementing integers
-		  - Improve security by making it harder for attackers to guess valid resource identifiers.
-		</textarea>
-			</section>
-			<!-- Slide 12 -->
-			<section data-markdown>
-				<textarea data-template>
-			## Common Issues & Mitigations
-			- **Vulnerable Libraries:** Utilise a tool to scan your dependencies.
-			- See [here](https://github.com/lack3r/security-training/security/dependabot)
-			- Similar: [Snyk](https://snyk.io/plans/)
-	    </textarea>
-			</section>
-			<!-- Slide 13 -->
-			<section data-markdown>
-				<textarea data-template>
-## Resources & Conclusion
+- Insecure token storage (avoid localStorage if possible).
+- Overly permissive CORS configurations.
+- Lack of input validation leading to injection attacks.
+- Not enforcing HTTPS in production.
+- Using sequential IDs that can be easily guessed.
+  </textarea>
+</section>
+<!-- Slide 11: Resources & Further Reading -->
+<section data-markdown>
+  <textarea data-template>
+## Resources & Further Reading
 - **ASP.NET Core Security Documentation**
 - **React Security Best Practices**
 - **OWASP Top Ten**
-- **[OWASP Cheat Sheet Series](https://cheatsheetseries.owasp.org/cheatsheets/HTTP_Headers_Cheat_Sheet.html)**
-- **Further Reading:**
-  - [JWT Best Practices](https://jwt.io/introduction/)
-  - [CORS in ASP.NET Core](https://docs.microsoft.com/en-us/aspnet/core/security/cors)
-  - [Content Security Policy (CSP)](https://developer.mozilla.org/en-US/docs/Web/HTTP/CSP)
-  
-*Thank you – Questions & Discussion*
-          </textarea>
-			</section>
-		</div>
-	</div>
+- **OWASP Cheat Sheet Series:** [HTTP Headers Cheat Sheet](https://cheatsheetseries.owasp.org/cheatsheets/HTTP_Headers_Cheat_Sheet.html)
+- **JWT Best Practices:** [jwt.io/introduction](https://jwt.io/introduction/)
+- **CORS in ASP.NET Core:** [Microsoft Docs](https://docs.microsoft.com/en-us/aspnet/core/security/cors)
+- **Content Security Policy (CSP):** [MDN Documentation](https://developer.mozilla.org/en-US/docs/Web/HTTP/CSP)
+- **Dependency Scanning:**
+- [Dependabot](https://github.com/dependabot)
+- [Snyk](https://snyk.io/)
+  </textarea>
+</section>
+<!-- Slide 12: Conclusion -->
+<section data-markdown>
+  <textarea data-template>
+## Conclusion & Q&A
+- Recap: Secure communication, robust authentication, and resource safety.
+- Questions & Discussion.
 
-	<script src="dist/reveal.js"></script>
-	<script src="plugin/notes/notes.js"></script>
-	<script src="plugin/markdown/markdown.js"></script>
-	<script src="plugin/highlight/highlight.js"></script>
-	<script>
-		Reveal.initialize({
-			hash: true,
-			plugins: [RevealMarkdown, RevealHighlight, RevealNotes]
-		});
-	</script>
+*Thank you for attending!*
+  </textarea>
+</section>
+</div>
+</div>
+<script src="dist/reveal.js"></script>
+<script src="plugin/notes/notes.js"></script>
+<script src="plugin/markdown/markdown.js"></script>
+<script src="plugin/highlight/highlight.js"></script>
+<script>
+Reveal.initialize({
+hash: true,
+plugins: [RevealMarkdown, RevealHighlight, RevealNotes]
+});
+</script>
 </body>
-
 </html>
